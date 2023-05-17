@@ -13,33 +13,48 @@ public class Player
     public int HP = 100;
     public const int MaxHP = 100;
 
-    private const float Acceleration = 5f;
-    private const float Friction = 0.3f;
+    private float Acceleration = 5f;
+    private float Friction = 0.3f;
     private const float MaxSpeed = 1.4f;
-    
+    private const float BoostSpeed = 2.1f;
+    private bool IsBoosting;
+
     private int _shotCooldown;
 
     public Rectangle Hitbox;
-    
+
     private Texture2D _texture;
     private Game1 _root;
-    
+
     public Player(Vector2 position, Texture2D texture, Game1 root)
     {
         Position = position;
         _texture = texture;
         _root = root;
-        
+
         Hitbox = new Rectangle((int)Position.X - 12, (int)Position.Y - 12, 24, 24);
     }
 
     public void Update(float deltaTime)
     {
-        // Move the player along its velocity
-        if (Velocity.Length() > MaxSpeed)
+        if (IsBoosting)
         {
-            Velocity.Normalize();
-            Velocity *= MaxSpeed;
+            // Move the player along its velocity
+            if (Velocity.Length() > BoostSpeed)
+            {
+                Velocity.Normalize();
+                Velocity *= BoostSpeed;
+            }
+        }
+        else
+        {
+            // Move the player along its velocity
+            if (Velocity.Length() > MaxSpeed)
+            {
+                Velocity.Normalize();
+                Velocity *= MaxSpeed;
+            }
+
         }
         Position += Velocity;
 
@@ -66,20 +81,33 @@ public class Player
         // Handle player inputs
         KeyboardState keyboardState = Keyboard.GetState();
 
-        // Acceleration and deceleration
+        // Acceleration and deceleration and boost
+        if (keyboardState.IsKeyDown(Keys.LeftShift))
+        {
+            IsBoosting = true;
+            Acceleration = 12f;
+            Friction = 0.6f;
+        }
+        else
+        {
+            Acceleration = 4f;
+            IsBoosting = false;
+            Friction = 0.3f;
+        }
+
         if (keyboardState.IsKeyDown(Keys.W))
         {
             Velocity += new Vector2(MathF.Cos(Rotation), MathF.Sin(Rotation)) * Acceleration * deltaTime;
         }
-        
+
         if (keyboardState.IsKeyDown(Keys.S))
         {
             Velocity -= new Vector2(MathF.Cos(Rotation), MathF.Sin(Rotation)) * Acceleration * deltaTime;
         }
-        
+
         // Rotate the player towards the cursor
         Vector2 mousePos = Mouse.GetState().Position.ToVector2();
-        
+
         mousePos.X /= _root.ScaleX;
         mousePos.Y /= _root.ScaleY;
 
@@ -87,9 +115,9 @@ public class Player
         float yDiff = mousePos.Y - Position.Y;
 
         Rotation = MathF.Atan2(yDiff, xDiff);
-        
+
         // Spawn bullet
-        if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+        if (Mouse.GetState().LeftButton == ButtonState.Pressed && !IsBoosting)
         {
             if (_shotCooldown <= 0)
             {
@@ -97,9 +125,9 @@ public class Player
                 _shotCooldown = 30;
             }
         }
-        
+
         _shotCooldown -= 1;
-        
+
         // Move player hitbox
         Hitbox.X = (int)Position.X - 12;
         Hitbox.Y = (int)Position.Y - 12;
