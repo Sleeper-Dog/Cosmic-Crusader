@@ -27,6 +27,7 @@ namespace Cosmic_Crusader
         private Texture2D _playerTexture;
         private Texture2D _enemyTexture;
         public Texture2D BulletTexture;
+        public Texture2D BulletTexture2;
 
         private SpriteFont _font;
 
@@ -56,7 +57,7 @@ namespace Cosmic_Crusader
 
         private enum Height
         {
-            Full = 1080,
+            Full = 1013,
             Half = 540,
             Quarter = 270
         }
@@ -103,6 +104,7 @@ namespace Cosmic_Crusader
             _playerTexture = Content.Load<Texture2D>("BlueDartShip");
             _enemyTexture = Content.Load<Texture2D>("bee");
             BulletTexture = Content.Load<Texture2D>("Bullet");
+            BulletTexture2 = Content.Load<Texture2D>("BulletStrong");
             _font = Content.Load<SpriteFont>("Font");
             
             _enemies = new List<Enemy>();
@@ -134,6 +136,7 @@ namespace Cosmic_Crusader
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            // Enemies logic
             _enemiesTimer--;
             if (_enemiesTimer <= 0 && _enemies.Count <= 4)
             {
@@ -144,6 +147,7 @@ namespace Cosmic_Crusader
                 int x = 0;
                 int y = 0;
                 
+                // Choose side to spawn on
                 if (side == 0)
                 {
                     x = rng.Next(TargetWidth);
@@ -191,7 +195,7 @@ namespace Cosmic_Crusader
                     
                     if (_enemies[j].Hitbox.Contains(Bullets[i].Position.ToPoint()))
                     {
-                        _enemies[j].HP -= 5;
+                        _enemies[j].HP -= Bullets[i]._bulletDamage;
                         Bullets.RemoveAt(i);
                         if (i > 0) i--;
                         

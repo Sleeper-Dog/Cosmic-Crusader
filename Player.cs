@@ -116,13 +116,21 @@ public class Player
 
         Rotation = MathF.Atan2(yDiff, xDiff);
 
-        // Spawn bullet
-        if (Mouse.GetState().LeftButton == ButtonState.Pressed && !IsBoosting)
+        // Shoot bullets
+        if (Mouse.GetState().LeftButton == ButtonState.Pressed && !IsBoosting) // Weak but fast
         {
             if (_shotCooldown <= 0)
             {
-                _root.Bullets.Add(new Bullet(Position, Rotation, _root.BulletTexture));
-                _shotCooldown = 30;
+                _root.Bullets.Add(new Bullet(Position, Rotation, _root.BulletTexture, 10, _root.BulletTexture2));
+                _shotCooldown = 23;
+            }
+        }
+        else if (Mouse.GetState().RightButton == ButtonState.Pressed && !IsBoosting) // Strong but slow
+        {
+            if (_shotCooldown <= 0)
+            {
+                _root.Bullets.Add(new Bullet(Position, Rotation, _root.BulletTexture, 15, _root.BulletTexture2));
+                _shotCooldown = 32;
             }
         }
 

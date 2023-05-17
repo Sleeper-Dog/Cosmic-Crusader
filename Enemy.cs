@@ -9,7 +9,7 @@ namespace Cosmic_Crusader
         public Vector2 Position;
         public Vector2 Velocity;
         public float Rotation;
-        public int HP = 10;
+        public int HP = 30;
 
         public Rectangle Hitbox;
         
