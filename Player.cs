@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -121,6 +122,7 @@ public class Player
         {
             if (_shotCooldown <= 0)
             {
+                _root.laserSound.Play(1f, 1f, 0f);
                 _root.Bullets.Add(new Bullet(Position, Rotation, _root.BulletTexture, 10, _root.BulletTexture2));
                 _shotCooldown = 23;
             }
@@ -129,6 +131,7 @@ public class Player
         {
             if (_shotCooldown <= 0)
             {
+                _root.laserSound.Play();
                 _root.Bullets.Add(new Bullet(Position, Rotation, _root.BulletTexture, 15, _root.BulletTexture2));
                 _shotCooldown = 32;
             }

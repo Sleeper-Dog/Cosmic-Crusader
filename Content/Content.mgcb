@@ -68,6 +68,12 @@
 /processorParam:TextureFormat=Compressed
 /build:File.spritefont;Font.spritefont
 
+#begin Laser Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Laser Sound.wav
+
 #begin Sprite-0002.png
 /importer:TextureImporter
 /processor:TextureProcessor

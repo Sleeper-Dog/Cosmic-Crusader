@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Text;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Cosmic_Crusader
 {
@@ -28,6 +29,8 @@ namespace Cosmic_Crusader
         private Texture2D _enemyTexture;
         public Texture2D BulletTexture;
         public Texture2D BulletTexture2;
+
+        public SoundEffect laserSound;
 
         private SpriteFont _font;
 
@@ -51,7 +54,7 @@ namespace Cosmic_Crusader
         public static int TargetWidth = (int)Width.Quarter;
         public static int TargetHeight = (int)Height.Quarter;
 
-        private int _scoreIncreaseCooldown = 60;
+        private int _scoreIncreaseCooldown = 100;
         
         public List<Bullet> Bullets = new();
 
@@ -106,6 +109,7 @@ namespace Cosmic_Crusader
             BulletTexture = Content.Load<Texture2D>("Bullet");
             BulletTexture2 = Content.Load<Texture2D>("BulletStrong");
             _font = Content.Load<SpriteFont>("Font");
+            laserSound = Content.Load<SoundEffect>("Laser Sound");
             
             _enemies = new List<Enemy>();
             Player = new Player(new Vector2(TargetWidth / 2, TargetHeight / 2), _playerTexture, this);
@@ -135,7 +139,7 @@ namespace Cosmic_Crusader
         private void GameUpdate(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
+            
             // Enemies logic
             _enemiesTimer--;
             if (_enemiesTimer <= 0 && _enemies.Count <= 4)
@@ -220,6 +224,7 @@ namespace Cosmic_Crusader
             {
                 if (enemy.HP <= 0)
                 {
+                    Score += 100;
                     enemiesToRemove.Add(enemy);
                     continue;
                 }
@@ -246,7 +251,7 @@ namespace Cosmic_Crusader
             if (_scoreIncreaseCooldown <= 0)
             {
                 Score += 10;
-                _scoreIncreaseCooldown = 60;
+                _scoreIncreaseCooldown = 100;
 
                 EnemyAcceleration += 0.0001f;
 
@@ -285,7 +290,7 @@ namespace Cosmic_Crusader
         {
             GraphicsDevice.SetRenderTarget(_renderTarget2D);
 
-            GraphicsDevice.Clear(new Color(28, 23, 41));
+            GraphicsDevice.Clear(new Color(11, 8, 30));
 
             _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
 
@@ -321,7 +326,7 @@ namespace Cosmic_Crusader
         {
             // Draw player's HP
             string hp = "HP: " + Player.HP + " / " + Player.MaxHP;
-            _spriteBatch.DrawString(_font, hp, new Vector2(10, 10), Color.White);
+            _spriteBatch.DrawString(_font, hp, new Vector2(10, 10), Color.LightGreen);
             
             // Draw player's score
             float textLength = _font.MeasureString(Score.ToString()).X;
