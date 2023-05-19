@@ -37,6 +37,12 @@
 /processorParam:TextureFormat=Color
 /build:BlueDartShip.png
 
+#begin Boost Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Boost Sound.wav
+
 #begin Bullet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -61,6 +67,12 @@
 /processorParam:TextureFormat=Color
 /build:BulletStrong.png
 
+#begin Damage Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Damage Sound.wav
+
 #begin File.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -73,6 +85,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Laser Sound.wav
+
+#begin Purrple Cat - Out There.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Purrple Cat - Out There.mp3
 
 #begin Sprite-0002.png
 /importer:TextureImporter

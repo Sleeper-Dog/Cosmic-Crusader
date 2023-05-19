@@ -11,7 +11,7 @@ public class Player
     public Vector2 Position;
     public Vector2 Velocity;
     public float Rotation;
-    public int HP = 100;
+    public int HP = 10;
     public const int MaxHP = 100;
 
     private float Acceleration = 5f;
@@ -19,8 +19,9 @@ public class Player
     private const float MaxSpeed = 1.4f;
     private const float BoostSpeed = 2.1f;
     private bool IsBoosting;
-
     private int _shotCooldown;
+
+    SoundEffectInstance soundEffectInstance;
 
     public Rectangle Hitbox;
 
@@ -32,6 +33,7 @@ public class Player
         Position = position;
         _texture = texture;
         _root = root;
+        SoundEffectInstance soundEffectInstance = _root.boostSound.CreateInstance();
 
         Hitbox = new Rectangle((int)Position.X - 12, (int)Position.Y - 12, 24, 24);
     }
@@ -85,6 +87,10 @@ public class Player
         // Acceleration and deceleration and boost
         if (keyboardState.IsKeyDown(Keys.LeftShift))
         {
+            if (!IsBoosting)
+            {
+                soundEffectInstance.Play();
+            }
             IsBoosting = true;
             Acceleration = 12f;
             Friction = 0.6f;
@@ -94,6 +100,14 @@ public class Player
             Acceleration = 4f;
             IsBoosting = false;
             Friction = 0.3f;
+        }
+
+        if (keyboardState.IsKeyUp(Keys.LeftShift))
+        {
+            if (soundEffectInstance.State == SoundState.Playing)
+            {
+                soundEffectInstance.Stop();
+            }
         }
 
         if (keyboardState.IsKeyDown(Keys.W))

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Text;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace Cosmic_Crusader
 {
@@ -31,6 +32,8 @@ namespace Cosmic_Crusader
         public Texture2D BulletTexture2;
 
         public SoundEffect laserSound;
+        public SoundEffect damageSound;
+        public SoundEffect boostSound;
 
         private SpriteFont _font;
 
@@ -45,6 +48,7 @@ namespace Cosmic_Crusader
         public float EnemyAcceleration = 0.01f;
 
         public int Score;
+        public float ScoreMulti = 1;
 
         private RenderTarget2D _renderTarget2D;
         private Matrix _scale;
@@ -110,7 +114,13 @@ namespace Cosmic_Crusader
             BulletTexture2 = Content.Load<Texture2D>("BulletStrong");
             _font = Content.Load<SpriteFont>("Font");
             laserSound = Content.Load<SoundEffect>("Laser Sound");
-            
+            damageSound = Content.Load<SoundEffect>("Damage Sound");
+            boostSound = Content.Load<SoundEffect>("Boost Sound");
+
+            Song song = Content.Load<Song>("Purrple Cat - Out There");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(song);
+
             _enemies = new List<Enemy>();
             Player = new Player(new Vector2(TargetWidth / 2, TargetHeight / 2), _playerTexture, this);
         }
@@ -224,14 +234,18 @@ namespace Cosmic_Crusader
             {
                 if (enemy.HP <= 0)
                 {
-                    Score += 100;
+                    ScoreMulti += 0.1f;
+                    float scoreGive = 100 * ScoreMulti;
+                    Score += Convert.ToInt32(scoreGive);
                     enemiesToRemove.Add(enemy);
                     continue;
                 }
                 
                 if (enemy.Hitbox.Intersects(Player.Hitbox))
                 {
-                    Player.HP -= 5;
+                    Player.HP -= 1;
+                    ScoreMulti = 1;
+                    damageSound.Play();
                     enemiesToRemove.Add(enemy);
                 }
             }
@@ -326,12 +340,36 @@ namespace Cosmic_Crusader
         {
             // Draw player's HP
             string hp = "HP: " + Player.HP + " / " + Player.MaxHP;
-            _spriteBatch.DrawString(_font, hp, new Vector2(10, 10), Color.LightGreen);
+            _spriteBatch.DrawString(_font, hp, new Vector2(5, 10), Color.LightGreen);
             
             // Draw player's score
             float textLength = _font.MeasureString(Score.ToString()).X;
             _spriteBatch.DrawString(_font, Score.ToString(), new Vector2(TargetWidth / 2 - MathF.Round(textLength / 2), 10), Color.White);
-            
+
+            // Draw player's score multiplier
+            string multi = "Score Multi: " + MathF.Round(ScoreMulti,2) + "x";
+            // Make it colorful
+            Color ScoreColor = Color.Gray;
+            switch (ScoreMulti)
+            {
+                case 1:
+                    ScoreColor = Color.Gray;
+                    break;
+                case >= 3:
+                    ScoreColor = Color.Red;
+                    break;
+                case >= 2:
+                    ScoreColor = Color.GreenYellow;
+                    break;
+                case >= 1.5f:
+                    ScoreColor = Color.LightGreen;
+                    break;
+                case > 1:
+                    ScoreColor = Color.White;
+                    break;
+            }
+            _spriteBatch.DrawString(_font, multi, new Vector2(5, 35), ScoreColor);
+
             foreach (var bullet in Bullets)
             {
                 bullet.Draw(_spriteBatch);
