@@ -33,10 +33,11 @@ public class Player
         Position = position;
         _texture = texture;
         _root = root;
-        SoundEffectInstance soundEffectInstance = _root.boostSound.CreateInstance();
-
+        soundEffectInstance = _root.boostSound.CreateInstance();
         Hitbox = new Rectangle((int)Position.X - 12, (int)Position.Y - 12, 24, 24);
     }
+
+    
 
     public void Update(float deltaTime)
     {
@@ -104,7 +105,7 @@ public class Player
 
         if (keyboardState.IsKeyUp(Keys.LeftShift))
         {
-            if (soundEffectInstance.State == SoundState.Playing)
+            if (soundEffectInstance != null && soundEffectInstance.State == SoundState.Playing)
             {
                 soundEffectInstance.Stop();
             }
