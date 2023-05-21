@@ -5,12 +5,14 @@ using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using SamplerState = Microsoft.Xna.Framework.Graphics.SamplerState;
 using System;
+using System.IO;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Text;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using Accessibility;
 
 namespace Cosmic_Crusader
 {
@@ -27,15 +29,19 @@ namespace Cosmic_Crusader
         private SpriteBatch _spriteBatch;
 
         private Texture2D _playerTexture;
+        private Texture2D _playerTexture2;
         private Texture2D _enemyTexture;
         public Texture2D BulletTexture;
         public Texture2D BulletTexture2;
 
-        public SoundEffect laserSound;
-        public SoundEffect damageSound;
-        public SoundEffect boostSound;
+        public SoundEffect LaserSound;
+        public SoundEffect DamageSound;
+        public SoundEffect BoostSound;
 
         private SpriteFont _font;
+
+        public string _highscorePath;
+
 
         private GameStates _gameState = GameStates.Start;
 
@@ -109,20 +115,22 @@ namespace Cosmic_Crusader
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _playerTexture = Content.Load<Texture2D>("BlueDartShip");
+            _playerTexture2 = Content.Load<Texture2D>("BlueDartShipFire");
             _enemyTexture = Content.Load<Texture2D>("bee");
             BulletTexture = Content.Load<Texture2D>("Bullet");
             BulletTexture2 = Content.Load<Texture2D>("BulletStrong");
             _font = Content.Load<SpriteFont>("Font");
-            laserSound = Content.Load<SoundEffect>("Laser Sound");
-            damageSound = Content.Load<SoundEffect>("Damage Sound");
-            boostSound = Content.Load<SoundEffect>("Boost Sound");
+            LaserSound = Content.Load<SoundEffect>("Laser Sound");
+            DamageSound = Content.Load<SoundEffect>("Damage Sound");
+            BoostSound = Content.Load<SoundEffect>("Boost Sound");
 
             Song song = Content.Load<Song>("Purrple Cat - Out There");
             MediaPlayer.IsRepeating = true;
+            MediaPlayer.Volume = 0.5f;
             MediaPlayer.Play(song);
 
             _enemies = new List<Enemy>();
-            Player = new Player(new Vector2(TargetWidth / 2, TargetHeight / 2), _playerTexture, this);
+            Player = new Player(new Vector2(TargetWidth / 2, TargetHeight / 2), _playerTexture, this, _playerTexture2);
         }
 
         protected override void Update(GameTime gameTime)
@@ -149,7 +157,7 @@ namespace Cosmic_Crusader
         private void GameUpdate(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            
+               
             // Enemies logic
             _enemiesTimer--;
             if (_enemiesTimer <= 0 && _enemies.Count <= 4)
@@ -227,7 +235,7 @@ namespace Cosmic_Crusader
                     break;
                 }
             }
-            
+
             // Check for enemy collisions and remove dead enemies
             List<Enemy> enemiesToRemove = new();
             foreach (var enemy in _enemies)
@@ -245,7 +253,7 @@ namespace Cosmic_Crusader
                 {
                     Player.HP -= 1;
                     ScoreMulti = 1;
-                    damageSound.Play();
+                    DamageSound.Play();
                     enemiesToRemove.Add(enemy);
                 }
             }
@@ -258,6 +266,7 @@ namespace Cosmic_Crusader
             if (Player.HP <= 0)
             {
                 _gameState = GameStates.GameOver;
+                Player.SoundEffectInstance.Stop();
             }
             
             // Increase score
@@ -320,7 +329,7 @@ namespace Cosmic_Crusader
             {
                 StartDraw();
             }
-            
+
             _spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);

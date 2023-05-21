@@ -12,28 +12,30 @@ public class Player
     public Vector2 Velocity;
     public float Rotation;
     public int HP = 10;
-    public const int MaxHP = 100;
+    public const int MaxHP = 10;
 
     private float Acceleration = 5f;
     private float Friction = 0.3f;
     private const float MaxSpeed = 1.4f;
     private const float BoostSpeed = 2.1f;
-    private bool IsBoosting;
+    private bool _isBoosting;
     private int _shotCooldown;
 
-    SoundEffectInstance soundEffectInstance;
+    public SoundEffectInstance SoundEffectInstance;
 
     public Rectangle Hitbox;
 
+    private Texture2D _boostTexture;
     private Texture2D _texture;
     private Game1 _root;
 
-    public Player(Vector2 position, Texture2D texture, Game1 root)
+    public Player(Vector2 position, Texture2D texture, Game1 root, Texture2D boostTexture)
     {
         Position = position;
         _texture = texture;
+        _boostTexture = boostTexture;
         _root = root;
-        soundEffectInstance = _root.boostSound.CreateInstance();
+        SoundEffectInstance = _root.BoostSound.CreateInstance();
         Hitbox = new Rectangle((int)Position.X - 12, (int)Position.Y - 12, 24, 24);
     }
 
@@ -41,7 +43,7 @@ public class Player
 
     public void Update(float deltaTime)
     {
-        if (IsBoosting)
+        if (_isBoosting)
         {
             // Move the player along its velocity
             if (Velocity.Length() > BoostSpeed)
@@ -88,26 +90,26 @@ public class Player
         // Acceleration and deceleration and boost
         if (keyboardState.IsKeyDown(Keys.LeftShift))
         {
-            if (!IsBoosting)
+            if (!_isBoosting)
             {
-                soundEffectInstance.Play();
+                SoundEffectInstance.Play();
             }
-            IsBoosting = true;
+            _isBoosting = true;
             Acceleration = 12f;
             Friction = 0.6f;
         }
         else
         {
             Acceleration = 4f;
-            IsBoosting = false;
+            _isBoosting = false;
             Friction = 0.3f;
         }
 
         if (keyboardState.IsKeyUp(Keys.LeftShift))
         {
-            if (soundEffectInstance != null && soundEffectInstance.State == SoundState.Playing)
+            if (SoundEffectInstance != null && SoundEffectInstance.State == SoundState.Playing)
             {
-                soundEffectInstance.Stop();
+                SoundEffectInstance.Stop();
             }
         }
 
@@ -133,20 +135,20 @@ public class Player
         Rotation = MathF.Atan2(yDiff, xDiff);
 
         // Shoot bullets
-        if (Mouse.GetState().LeftButton == ButtonState.Pressed && !IsBoosting) // Weak but fast
+        if (Mouse.GetState().LeftButton == ButtonState.Pressed && !_isBoosting) // Weak but fast
         {
             if (_shotCooldown <= 0)
             {
-                _root.laserSound.Play(1f, 1f, 0f);
+                _root.LaserSound.Play(1f, 1f, 0f);
                 _root.Bullets.Add(new Bullet(Position, Rotation, _root.BulletTexture, 10, _root.BulletTexture2));
                 _shotCooldown = 23;
             }
         }
-        else if (Mouse.GetState().RightButton == ButtonState.Pressed && !IsBoosting) // Strong but slow
+        else if (Mouse.GetState().RightButton == ButtonState.Pressed && !_isBoosting) // Strong but slow
         {
             if (_shotCooldown <= 0)
             {
-                _root.laserSound.Play();
+                _root.LaserSound.Play();
                 _root.Bullets.Add(new Bullet(Position, Rotation, _root.BulletTexture, 15, _root.BulletTexture2));
                 _shotCooldown = 32;
             }
@@ -169,6 +171,15 @@ public class Player
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(_texture, Position, null, Color.White, Rotation, new Vector2(16, 16), new Vector2(1, 1), SpriteEffects.None, 0);
+        if (_isBoosting)
+        {
+            spriteBatch.Draw(_boostTexture, Position, null, Color.White, Rotation, new Vector2(16, 16), new Vector2(1, 1), SpriteEffects.None, 0);
+
+        }
+        else
+        {
+            spriteBatch.Draw(_texture, Position, null, Color.White, Rotation, new Vector2(16, 16), new Vector2(1, 1), SpriteEffects.None, 0);
+
+        }
     }
 }
